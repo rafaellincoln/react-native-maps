@@ -428,14 +428,13 @@ id regionAsJSON(MKCoordinateRegion region) {
 - (void)setKmlSrc:(NSString *)kmlUrl {
     
   _kmlSrc = kmlUrl;
-  
-  NSURL *url = [NSURL URLWithString:kmlUrl];
   NSData *urlData = nil;
   
-  if ([url isFileURL]) {
+  if ([kmlUrl hasPrefix:@"http"]) {
+    NSURL *url = [NSURL URLWithString:kmlUrl];
     urlData = [NSData dataWithContentsOfURL:url];
   } else {
-    urlData = [[NSFileManager defaultManager] contentsAtPath:kmlUrl];
+    urlData = [NSData dataWithContentsOfFile:kmlUrl];
   }
   
   GMUKMLParser *parser = [[GMUKMLParser alloc] initWithData:urlData];
@@ -463,9 +462,9 @@ id regionAsJSON(MKCoordinateRegion region) {
       
     [self insertReactSubview:(UIView *) marker atIndex:index];
     
-    [markers addObject:@{@"id": marker.identifier,
-                         @"title": marker.title,
-                         @"description": marker.subtitle,
+    [markers addObject:@{@"id": marker.identifier == nil ? @"" : marker.identifier,
+                         @"title": marker.title == nil ? @"" : marker.title,
+                         @"description": marker.subtitle == nil ? @"" : marker.subtitle,
                          @"coordinate": @{
                              @"latitude": @(location.latitude),
                              @"longitude": @(location.longitude)
